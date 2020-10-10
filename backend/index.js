@@ -7,6 +7,7 @@ const PORT = 5001;
 app.use(express.json());
 
 app.use('/auth', require('./routes/auth'));
+app.use('/product', require('./routes/product'));
 
 // Connect DB
 connectDB().then(() => {

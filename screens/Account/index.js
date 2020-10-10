@@ -15,11 +15,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import AuthView from './AuthView';
 import UserAccount from './UserAccount';
+import ManageProduct from './ManageProduct';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 
 function AccountScreen({ navigation }) {
-  useEffect(() => {
+  useFocusEffect(() => {
     // AsyncStorage.removeItem('token');
     AsyncStorage.getItem('token').then((token) => {
       if (token) {
@@ -44,9 +46,14 @@ export default function Account(props) {
     <Stack.Navigator
       screenOptions={{ gestureEnabled: false, headerLeft: false }}
     >
-      <Stack.Screen name='AccountRoot' component={AccountScreen} />
+      <Stack.Screen
+        name='AccountRoot'
+        component={AccountScreen}
+        options={{ title: 'Account' }}
+      />
       <Stack.Screen name='AccountAuth' component={AuthView} />
       <Stack.Screen name='UserAccount' component={UserAccount} />
+      <Stack.Screen name='ManageProduct' component={ManageProduct} />
     </Stack.Navigator>
   );
 }

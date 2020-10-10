@@ -81,6 +81,7 @@ export default function AuthView({ navigation }) {
             marginTop: 14,
             paddingHorizontal: 10,
           }}
+          defaultValue={''}
           placeholder={'Email'}
           textContentType='emailAddress'
           keyboardType='email-address'
@@ -99,6 +100,7 @@ export default function AuthView({ navigation }) {
           <TextInput
             style={{ flex: 1 }}
             secureTextEntry={!showPassword}
+            defaultValue={''}
             placeholder={'Password'}
             textContentType='password'
             keyboardType='visible-password'

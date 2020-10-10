@@ -12,7 +12,106 @@ import {
 import axios from 'axios';
 import { api } from '../../utils/default';
 
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
+
+function Admin() {
+  const navigation = useNavigation();
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={{ marginTop: 10 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: 'bold',
+            paddingHorizontal: 10,
+          }}
+        >
+          Admin Panel
+        </Text>
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => {
+            navigation.navigate('Account', {
+              screen: 'ManageProduct',
+              params: {
+                action: 'ADD_PRODUCT',
+              },
+            });
+          }}
+        >
+          <Text style={styles.optionCardTitle}>Add Product</Text>
+          <Text style={styles.optionCardSubtitle}>Create a new Product</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => {
+            navigation.navigate('Account', {
+              screen: 'ManageProduct',
+              params: {
+                action: 'ADD_FEATURED_PRODUCT',
+              },
+            });
+          }}
+        >
+          <Text style={styles.optionCardTitle}>Add Featured Product</Text>
+          <Text style={styles.optionCardSubtitle}>
+            Create a new featured Product
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => {
+            navigation.navigate('Account', {
+              screen: 'ManageProduct',
+              params: {
+                action: 'EDIT_PRODUCT',
+              },
+            });
+          }}
+        >
+          <Text style={styles.optionCardTitle}>Edit Product</Text>
+          <Text style={styles.optionCardSubtitle}>
+            Edit an existing Product
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => {
+            navigation.navigate('Account', {
+              screen: 'ManageProduct',
+              params: {
+                action: 'DELETE_PRODUCT',
+              },
+            });
+          }}
+        >
+          <Text style={styles.optionCardTitle}>Delete Product</Text>
+          <Text style={styles.optionCardSubtitle}>
+            Delete an existing Product
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#fafafa',
+            alignItems: 'center',
+            padding: 10,
+            marginTop: 10,
+          }}
+          onPress={() => {
+            AsyncStorage.removeItem('token');
+            navigation.navigate('Account', { screen: 'AccountAuth' });
+          }}
+        >
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
+}
 
 export default function UserAccountView({ route, navigation }) {
   const [user, setUser] = useState(null);
@@ -42,54 +141,25 @@ export default function UserAccountView({ route, navigation }) {
     );
   }
   if (user.isAdmin) {
-    return (
-      <View style={{}}>
-        <ScrollView
-          style={{ marginTop: 10 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: 'bold',
-              paddingHorizontal: 10,
-            }}
-          >
-            Admin Panel
-          </Text>
-          <View style={styles.optionCard}>
-            <Text style={styles.optionCardTitle}>All Products</Text>
-            <Text style={styles.optionCardSubtitle}>
-              Manage all your products
-            </Text>
-          </View>
-          <View style={styles.optionCard}>
-            <Text style={styles.optionCardTitle}>All Products</Text>
-            <Text style={styles.optionCardSubtitle}>
-              Manage all your products
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#fafafa',
-              alignItems: 'center',
-              padding: 10,
-              marginTop: 10,
-            }}
-            onPress={() => {
-              AsyncStorage.removeItem('token');
-              navigation.navigate('Account', { screen: 'AccountAuth' });
-            }}
-          >
-            <Text>Logout</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-    );
+    return <Admin />;
   }
   return (
     <View>
       <Text>{JSON.stringify(user)}</Text>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#fafafa',
+          alignItems: 'center',
+          padding: 10,
+          marginTop: 10,
+        }}
+        onPress={() => {
+          AsyncStorage.removeItem('token');
+          navigation.navigate('Account', { screen: 'AccountAuth' });
+        }}
+      >
+        <Text>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
