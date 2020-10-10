@@ -17,7 +17,7 @@ import Home from './screens/Home';
 import Categories from './screens/Categories';
 import Cart from './screens/Cart';
 import Wishlist from './screens/Wishlist';
-import Account from './screens/Account';
+import Account from './screens/Account/index';
 
 StatusBar.setBarStyle('dark-content');
 

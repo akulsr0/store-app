@@ -7,8 +7,6 @@ const PORT = 5001;
 app.use(express.json());
 
 app.use('/auth', require('./routes/auth'));
-// app.use('/login', require('./routes/login'));
-// app.use('/register', require('./routes/register'));
 
 // Connect DB
 connectDB().then(() => {

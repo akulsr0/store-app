@@ -1,25 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  ScrollView,
-} from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 import axios from 'axios';
-import { api } from '../utils/default';
+import { api } from '../../utils/default';
 
-import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-community/async-storage';
 import { Feather as Icon } from '@expo/vector-icons';
 
-const Stack = createStackNavigator();
-
-function AuthView({ navigation }) {
+export default function AuthView({ navigation }) {
   const [view, setView] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -29,6 +17,10 @@ function AuthView({ navigation }) {
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+
+  navigation.setOptions({
+    headerTitle: view === 'login' ? 'Login' : 'Register',
+  });
 
   async function loginUser(email, password) {
     try {
@@ -43,8 +35,15 @@ function AuthView({ navigation }) {
         },
       };
       const { data } = await axios.post(url, body, config);
-      await AsyncStorage.setItem('token', data.token);
-      Alert.alert(data.msg);
+      if (data.success) {
+        await AsyncStorage.setItem('token', data.token);
+        navigation.navigate('Account', {
+          screen: 'UserAccount',
+          params: { token: data.token },
+        });
+      } else {
+        Alert.alert(data.msg);
+      }
     } catch (err) {
       Alert.alert(err.message);
     }
@@ -232,118 +231,4 @@ function AuthView({ navigation }) {
   }
 }
 
-function UserAccountView({ navigation }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    Alert.alert(JSON.stringify(navigation));
-    AsyncStorage.getItem('token').then((token) => {
-      const url = `${api}/auth/`;
-      const body = JSON.stringify({ token });
-      const config = {
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
-      axios.post(url, body, config).then((res) => {
-        setUser(res.data.user);
-      });
-    });
-  }, []);
-
-  if (!user) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size='large' />
-      </View>
-    );
-  }
-  if (user.isAdmin) {
-    return (
-      <View style={{}}>
-        <ScrollView
-          style={{ marginTop: 10 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: 'bold',
-              paddingHorizontal: 10,
-            }}
-          >
-            Admin Panel
-          </Text>
-          <View style={styles.optionCard}>
-            <Text style={styles.optionCardTitle}>All Products</Text>
-            <Text style={styles.optionCardSubtitle}>
-              Manage all your products
-            </Text>
-          </View>
-          <View style={styles.optionCard}>
-            <Text style={styles.optionCardTitle}>All Products</Text>
-            <Text style={styles.optionCardSubtitle}>
-              Manage all your products
-            </Text>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
-  return (
-    <View>
-      <Text>{user.name}</Text>
-    </View>
-  );
-}
-
-function AccountScreen({ navigation }) {
-  useEffect(() => {
-    // AsyncStorage.removeItem('token');
-    AsyncStorage.getItem('token').then((token) => {
-      if (token) {
-        navigation.navigate('User');
-      } else {
-        navigation.navigate('Auth');
-      }
-    });
-  });
-  return (
-    <View style={{ flex: 1 }}>
-      <ActivityIndicator size='large' />
-    </View>
-  );
-}
-
-export default function Account(props) {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name='Account'>
-        {() => <AccountScreen {...props} />}
-      </Stack.Screen>
-      <Stack.Screen name='Auth'>{() => <AuthView {...props} />}</Stack.Screen>
-      <Stack.Screen name='User' options={{ headerTitle: 'My Account' }}>
-        {() => <UserAccountView {...props} />}
-      </Stack.Screen>
-    </Stack.Navigator>
-  );
-}
-
-const styles = StyleSheet.create({
-  optionCard: {
-    backgroundColor: 'white',
-    borderBottomColor: '#ced6e0',
-    borderBottomWidth: 0.3,
-    paddingHorizontal: 10,
-    marginTop: 10,
-    paddingVertical: 8,
-  },
-  optionCardTitle: {
-    fontSize: 18,
-  },
-  optionCardSubtitle: {
-    fontSize: 14,
-    marginTop: 4,
-    fontWeight: '300',
-  },
-});
+console.disableYellowBox = true;
