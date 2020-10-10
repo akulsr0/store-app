@@ -3,6 +3,11 @@ const router = Router();
 
 const Product = require('../models/Product');
 
+router.get('/all', async (req, res) => {
+  const products = await Product.find({});
+  res.json(products);
+});
+
 router.post('/add-product', async (req, res) => {
   try {
     const {
@@ -19,7 +24,7 @@ router.post('/add-product', async (req, res) => {
       price: { actualPrice, currentPrice },
       category,
       description: { short: shortDescription, long: longDescription },
-      images,
+      images: images.split(',').map((img) => img.trim()),
     };
     const product = new Product(productObj);
     await product.save();

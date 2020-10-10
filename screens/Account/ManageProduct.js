@@ -6,8 +6,11 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Image,
+  ScrollView,
+  Clipboard,
 } from 'react-native';
-import { Feather as Icon } from '@expo/vector-icons';
+import { Feather as Icon, FontAwesome as FAIcon } from '@expo/vector-icons';
 
 import Category from '../../utils/categories';
 import { api } from '../../utils/default';
@@ -75,92 +78,95 @@ function AddProduct() {
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Product</Text>
-      <TextInput
-        style={{
-          height: 40,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-        }}
-        placeholder={'Title'}
-        onChangeText={(text) => setTitle(text)}
-      />
-      <TextInput
-        style={{
-          height: 40,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-        }}
-        placeholder={'Actual Price'}
-        keyboardType='numeric'
-        onChangeText={(text) => setActualPrice(text)}
-      />
-      <TextInput
-        style={{
-          height: 40,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-        }}
-        placeholder={'Current Price'}
-        keyboardType='numeric'
-        onChangeText={(text) => setCurrentPrice(text)}
-      />
-      <TextInput
-        style={{
-          height: 100,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-          textAlignVertical: 'top',
-        }}
-        placeholder={'Image URLs (comma seperated)'}
-        multiline
-        onChangeText={(text) => setImages(text)}
-      />
-      <TextInput
-        style={{
-          height: 40,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-        }}
-        placeholder={'Short Description'}
-        onChangeText={(text) => setShortDescription(text)}
-      />
-      <TextInput
-        style={{
-          height: 140,
-          backgroundColor: '#fbfbfb',
-          marginTop: 14,
-          paddingHorizontal: 10,
-          textAlignVertical: 'top',
-        }}
-        placeholder={'Long Description'}
-        multiline
-        onChangeText={(text) => setLongDescription(text)}
-      />
-      <View style={{ marginTop: 14, height: 300 }}>
-        <Text>Category</Text>
-        <Picker
-          selectedValue={category}
-          style={{ height: 50, width: '100%' }}
-          onValueChange={(itemValue, itemIndex) => {
-            setCategory(itemValue);
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Add Product</Text>
+        <TextInput
+          style={{
+            height: 40,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
           }}
-        >
-          <Picker.Item label={'Select'} value={null} />
-          {Category.map((c) => (
-            <Picker.Item label={c} value={c} />
-          ))}
-        </Picker>
+          placeholder={'Title'}
+          onChangeText={(text) => setTitle(text)}
+        />
+        <TextInput
+          style={{
+            height: 40,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
+          }}
+          placeholder={'Actual Price'}
+          keyboardType='numeric'
+          onChangeText={(text) => setActualPrice(text)}
+        />
+        <TextInput
+          style={{
+            height: 40,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
+          }}
+          placeholder={'Current Price'}
+          keyboardType='numeric'
+          onChangeText={(text) => setCurrentPrice(text)}
+        />
+        <TextInput
+          style={{
+            height: 100,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
+            textAlignVertical: 'top',
+          }}
+          placeholder={'Image URLs (comma seperated)'}
+          multiline
+          onChangeText={(text) => setImages(text)}
+        />
+        <TextInput
+          style={{
+            height: 40,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
+          }}
+          placeholder={'Short Description'}
+          onChangeText={(text) => setShortDescription(text)}
+        />
+        <TextInput
+          style={{
+            height: 140,
+            backgroundColor: '#fbfbfb',
+            marginTop: 14,
+            paddingHorizontal: 10,
+            textAlignVertical: 'top',
+          }}
+          placeholder={'Long Description'}
+          multiline
+          onChangeText={(text) => setLongDescription(text)}
+        />
+        <View style={{ marginTop: 14, height: 300 }}>
+          <Text>Category</Text>
+          <Picker
+            selectedValue={category}
+            style={{ height: 50, width: '100%' }}
+            onValueChange={(itemValue, itemIndex) => {
+              setCategory(itemValue);
+            }}
+          >
+            <Picker.Item label={'Select'} value={null} />
+            {Category.map((c) => (
+              <Picker.Item label={c} value={c} />
+            ))}
+          </Picker>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
+
 function AddFeaturedProduct() {
   return (
     <View style={styles.container}>
@@ -168,13 +174,124 @@ function AddFeaturedProduct() {
     </View>
   );
 }
+
 function EditProduct() {
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  useEffect(() => {
+    Axios.get(`${api}/product/all`).then(({ data }) => {
+      setProducts(data);
+      setFilteredProducts(data);
+    });
+  }, []);
+
+  const Rating = ({ rating, maxRating }) => {
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        {Array(rating)
+          .fill(1)
+          .map((el) => (
+            <FAIcon name='star' size={20} color='#2e2e2e' />
+          ))}
+        {Array(maxRating - rating)
+          .fill(1)
+          .map((el) => (
+            <FAIcon name='star-o' size={20} color='#2e2e2e' />
+          ))}
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Edit Product</Text>
-    </View>
+    <ScrollView showsHorizontalScrollIndicator={false}>
+      <View style={{ ...styles.container, paddingHorizontal: 0 }}>
+        <Text style={{ ...styles.title, paddingHorizontal: 10 }}>
+          Edit Product
+        </Text>
+        <TextInput
+          style={{
+            height: 40,
+            backgroundColor: '#fbfbfb',
+            marginTop: 12,
+            paddingHorizontal: 10,
+          }}
+          placeholder='Search Product'
+          onChangeText={(text) => {
+            if (text === '') {
+              setFilteredProducts(products);
+            } else {
+              setFilteredProducts(
+                products.filter((p) =>
+                  p.title.toLowerCase().startsWith(text.toLowerCase())
+                )
+              );
+            }
+          }}
+        />
+        {filteredProducts.map((p) => (
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#fafafa',
+              marginTop: 10,
+              paddingHorizontal: 8,
+              paddingVertical: 10,
+              flexDirection: 'row',
+            }}
+          >
+            <Image
+              style={{ width: 100, height: 100 }}
+              source={{ uri: p.images[0] }}
+            />
+            <View style={{ paddingHorizontal: 10 }}>
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                }}
+              >
+                {p.title}
+              </Text>
+              <Text style={{ marginTop: 4 }}>
+                {`Id: ${p._id}`}
+                <TouchableOpacity
+                  style={{ paddingHorizontal: 10 }}
+                  onPress={() => {
+                    Clipboard.setString(p._id);
+                  }}
+                >
+                  <Icon name='copy' />
+                </TouchableOpacity>
+              </Text>
+              <View style={{ marginTop: 4 }}>
+                <Rating
+                  rating={
+                    p.rating.ratings.length > 0
+                      ? Math.floor(
+                          p.rating.ratings.reduce((acc, val) => acc + val) /
+                            p.rating.ratings.length
+                        )
+                      : 0
+                  }
+                  maxRating={5}
+                />
+              </View>
+              <View style={{ marginTop: 6, flexDirection: 'row' }}>
+                <Text style={{ textDecorationLine: 'line-through' }}>
+                  ₹{p.price.actualPrice}
+                </Text>
+                <Text style={{ fontWeight: 'bold', marginLeft: 8 }}>
+                  ₹{p.price.currentPrice}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
+
 function DeleteProduct() {
   return (
     <View style={styles.container}>
