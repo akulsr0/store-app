@@ -113,7 +113,7 @@ function Admin() {
             navigation.navigate('Account', {
               screen: 'ManageProduct',
               params: {
-                action: 'EDIT_PRODUCT',
+                action: 'EDIT_PRODUCTS_SCREEN',
               },
             });
           }}

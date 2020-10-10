@@ -175,9 +175,11 @@ function AddFeaturedProduct() {
   );
 }
 
-function EditProduct() {
+function EditProductsScreen() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     Axios.get(`${api}/product/all`).then(({ data }) => {
@@ -238,6 +240,15 @@ function EditProduct() {
               paddingVertical: 10,
               flexDirection: 'row',
             }}
+            onPress={() => {
+              navigation.navigate('Account', {
+                screen: 'ManageProduct',
+                params: {
+                  action: 'EDIT_PRODUCT',
+                  product: p,
+                },
+              });
+            }}
           >
             <Image
               style={{ width: 100, height: 100 }}
@@ -292,6 +303,267 @@ function EditProduct() {
   );
 }
 
+function EditProduct({ product }) {
+  const [updatedProduct, setUpdatedProduct] = useState({ ...product });
+  const [moreImages, setMoreImages] = useState(null);
+
+  const navigation = useNavigation();
+
+  async function editProduct() {
+    const url = `${api}/product/${product._id}/edit`;
+    let bodyObj;
+    if (moreImages !== null) {
+      const newImagesArray = moreImages.split(',').map((i) => i.trim());
+      bodyObj = {
+        ...updatedProduct,
+        images: [...updatedProduct.images, ...newImagesArray],
+      };
+    } else {
+      bodyObj = { ...updatedProduct };
+    }
+    const body = JSON.stringify(bodyObj);
+    const config = {
+      headers: {
+        'Content-type': 'application/json',
+      },
+    };
+    const { data } = await Axios.post(url, body, config);
+    if (data.success) {
+      navigation.navigate('Account', {
+        screen: 'ManageProduct',
+        params: {
+          action: 'EDIT_PRODUCTS_SCREEN',
+        },
+      });
+      Alert.alert('Saved');
+    } else {
+      Alert.alert("Something wen't wrong");
+    }
+  }
+
+  navigation.setOptions({
+    headerLeft: () => (
+      <TouchableOpacity
+        style={{ paddingHorizontal: 4 }}
+        onPress={() => {
+          navigation.navigate('Account', {
+            screen: 'ManageProduct',
+            params: {
+              action: 'EDIT_PRODUCTS_SCREEN',
+            },
+          });
+        }}
+      >
+        <Icon name='chevron-left' size={26} />
+      </TouchableOpacity>
+    ),
+    headerRight: () => (
+      <TouchableOpacity
+        style={{ paddingHorizontal: 6 }}
+        onPress={() => {
+          editProduct();
+        }}
+      >
+        <Icon name='check' size={24} />
+      </TouchableOpacity>
+    ),
+  });
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={{ marginTop: 10 }}>
+        <Text style={{ fontWeight: 'bold', fontSize: 16, marginHorizontal: 6 }}>
+          {'Product Id: '}
+          <Text style={{ fontWeight: '400' }}>{product._id}</Text>
+        </Text>
+        <View
+          style={{ paddingHorizontal: 6, marginTop: 20, paddingBottom: 20 }}
+        >
+          {/* Title */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Title:</Text>
+            <TextInput
+              style={{ ...styles.input, flex: 1, marginLeft: 6 }}
+              defaultValue={updatedProduct.title}
+              placeholder={'Title'}
+              onChangeText={(text) =>
+                setUpdatedProduct({ ...updatedProduct, title: text })
+              }
+            />
+          </View>
+          {/* Actual Price */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+              Actual Price:
+            </Text>
+            <TextInput
+              style={{ ...styles.input, flex: 1, marginLeft: 6 }}
+              defaultValue={JSON.stringify(product.price.actualPrice)}
+              placeholder={'Actual Price'}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                setUpdatedProduct({
+                  ...updatedProduct,
+                  price: {
+                    actualPrice: text,
+                    currentPrice: updatedProduct.price.currentPrice,
+                  },
+                });
+              }}
+            />
+          </View>
+          {/* Current Price */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+              Current Price:
+            </Text>
+            <TextInput
+              style={{ ...styles.input, flex: 1, marginLeft: 6 }}
+              defaultValue={JSON.stringify(product.price.currentPrice)}
+              placeholder={'Current Price'}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                setUpdatedProduct({
+                  ...updatedProduct,
+                  price: {
+                    currentPrice: text,
+                    actualPrice: updatedProduct.price.actualPrice,
+                  },
+                });
+              }}
+            />
+          </View>
+          {/* Images */}
+          <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>
+            Images:
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 10,
+              }}
+            >
+              {updatedProduct.images.map((img) => (
+                <View style={{ marginRight: 10 }}>
+                  <Image
+                    style={{ width: 200, height: 200 }}
+                    source={{ uri: img }}
+                  />
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#fafafa',
+                      paddingVertical: 6,
+                      alignItems: 'center',
+                    }}
+                    onPress={() => {
+                      setUpdatedProduct({
+                        ...updatedProduct,
+                        images: updatedProduct.images.filter((i) => i !== img),
+                      });
+                    }}
+                  >
+                    <Icon name='trash-2' size={20} color='#333' />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+          <TextInput
+            style={{
+              ...styles.input,
+              marginTop: 10,
+              height: 100,
+              textAlignVertical: 'top',
+            }}
+            multiline
+            placeholder='Add More Images'
+            onChangeText={(text) => setMoreImages(text)}
+          />
+          {/* Description */}
+          <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>
+            Short Description:
+          </Text>
+          <TextInput
+            style={{
+              ...styles.input,
+              marginTop: 6,
+            }}
+            defaultValue={product.description.short}
+            placeholder='Short Description'
+            onChangeText={(text) => {
+              setUpdatedProduct({
+                ...updatedProduct,
+                description: {
+                  short: text,
+                  long: updatedProduct.description.long,
+                },
+              });
+            }}
+          />
+          {/* Long Description */}
+          <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>
+            Long Description:
+          </Text>
+          <TextInput
+            style={{
+              ...styles.input,
+              marginTop: 10,
+              height: 200,
+              textAlignVertical: 'top',
+            }}
+            defaultValue={product.description.long}
+            multiline
+            placeholder='Long Description'
+            onChangeText={(text) => {
+              setUpdatedProduct({
+                ...updatedProduct,
+                description: {
+                  long: text,
+                  short: updatedProduct.description.short,
+                },
+              });
+            }}
+          />
+          {/* Category */}
+          <View style={{ height: 400, marginTop: 10 }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>
+              Category:
+            </Text>
+            <Picker
+              selectedValue={updatedProduct.category}
+              style={{ height: 50, width: '100%' }}
+              onValueChange={(itemValue, itemIndex) => {
+                setUpdatedProduct({
+                  ...updatedProduct,
+                  category: itemValue,
+                });
+              }}
+            >
+              {Category.map((c) => (
+                <Picker.Item label={c} value={c} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
+
 function DeleteProduct() {
   return (
     <View style={styles.container}>
@@ -323,9 +595,12 @@ export default function ManageProduct({ route }) {
     case 'ADD_FEATURED_PRODUCT':
       navigation.setOptions({ headerTitle: 'Add Featured Product' });
       return <AddFeaturedProduct />;
+    case 'EDIT_PRODUCTS_SCREEN':
+      navigation.setOptions({ headerTitle: 'Edit Products' });
+      return <EditProductsScreen />;
     case 'EDIT_PRODUCT':
       navigation.setOptions({ headerTitle: 'Edit Product' });
-      return <EditProduct />;
+      return <EditProduct product={route.params.product} />;
     case 'DELETE_PRODUCT':
       navigation.setOptions({ headerTitle: 'Delete Product' });
       return <DeleteProduct />;
@@ -342,5 +617,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  input: {
+    height: 40,
+    backgroundColor: '#fbfbfb',
+    paddingHorizontal: 10,
   },
 });

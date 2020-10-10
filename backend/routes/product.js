@@ -34,4 +34,17 @@ router.post('/add-product', async (req, res) => {
   }
 });
 
+router.post('/:id/edit', async (req, res) => {
+  try {
+    const product_id = req.params.id;
+    const updatedProduct = await Product.findByIdAndUpdate(product_id, {
+      ...req.body,
+    });
+
+    res.json({ product_id, updatedProduct, success: true });
+  } catch (error) {
+    res.json({ success: false, msg: error.message });
+  }
+});
+
 module.exports = router;
