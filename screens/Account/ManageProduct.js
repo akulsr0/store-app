@@ -168,9 +168,95 @@ function AddProduct() {
 }
 
 function AddFeaturedProduct() {
+  const navigation = useNavigation();
+  const [pid, setPID] = useState(null);
+  const [product, setProduct] = useState(null);
+
+  async function addFeaturedProduct() {
+    setProduct(null);
+    const url = `${api}/product/${pid}`;
+    const { data } = await Axios.get(url);
+    setProduct(data.product);
+    if (data.success) {
+      Alert.alert(
+        `Add Featured Product`,
+        `Are you sure you want to add ${data.product.title} as Featured Product?`,
+        [
+          { text: 'No' },
+          {
+            text: 'Yes',
+            onPress: async () => {
+              const url = `${api}/product/${pid}/edit`;
+              const bodyObj = { ...product, isFeatured: true };
+              const body = JSON.stringify(bodyObj);
+              const config = {
+                headers: {
+                  'Content-type': 'application/json',
+                },
+              };
+              const { data } = await Axios.post(url, body, config);
+              if (data.success) {
+                Alert.alert('Added to Featured Products');
+              }
+            },
+          },
+        ]
+      );
+    }
+  }
+
+  async function searchProduct() {
+    setProduct(null);
+    const url = `${api}/product/${pid}`;
+    const { data } = await Axios.get(url);
+    if (data.success) {
+      setProduct(data.product);
+    }
+  }
+
+  navigation.setOptions({
+    headerRight: () =>
+      pid ? (
+        <TouchableOpacity
+          style={{ paddingHorizontal: 10 }}
+          onPress={addFeaturedProduct}
+        >
+          <Icon name='check' size={24} />
+        </TouchableOpacity>
+      ) : null,
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add Featured Product</Text>
+      <View style={{ flexDirection: 'row', marginTop: 10 }}>
+        <View
+          style={{
+            backgroundColor: '#fbfbfb',
+            justifyContent: 'center',
+            paddingLeft: 8,
+          }}
+        >
+          <Text style={{ fontWeight: 'bold' }}>ID:</Text>
+        </View>
+        <TextInput
+          style={{ ...styles.input, flex: 1 }}
+          onChangeText={(text) => setPID(text)}
+        />
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#333',
+            paddingHorizontal: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={searchProduct}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Search</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* <Text>{JSON.stringify(product)}</Text> */}
     </View>
   );
 }
@@ -359,7 +445,7 @@ function EditProduct({ product }) {
     ),
     headerRight: () => (
       <TouchableOpacity
-        style={{ paddingHorizontal: 6 }}
+        style={{ paddingHorizontal: 10 }}
         onPress={() => {
           editProduct();
         }}

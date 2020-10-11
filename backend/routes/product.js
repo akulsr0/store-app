@@ -34,13 +34,23 @@ router.post('/add-product', async (req, res) => {
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const product_id = req.params.id;
+    const product = await Product.findById(product_id);
+    res.json({ product, success: true });
+  } catch (error) {
+    res.json({ msg: error.message, success: false });
+  }
+});
+
 router.post('/:id/edit', async (req, res) => {
   try {
     const product_id = req.params.id;
     const updatedProduct = await Product.findByIdAndUpdate(product_id, {
       ...req.body,
     });
-
+    console.log(updatedProduct);
     res.json({ product_id, updatedProduct, success: true });
   } catch (error) {
     res.json({ success: false, msg: error.message });

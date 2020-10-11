@@ -9,6 +9,7 @@ const productSchema = Schema({
     actualPrice: Number,
     currentPrice: Number,
   },
+  isFeatured: { type: Boolean, default: false },
   rating: {
     ratings: [{ type: Number, min: 0, max: 5 }],
   },
