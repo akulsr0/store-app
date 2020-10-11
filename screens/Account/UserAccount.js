@@ -113,6 +113,32 @@ function Admin() {
             navigation.navigate('Account', {
               screen: 'ManageProduct',
               params: {
+                action: 'REMOVE_FEATURED_PRODUCT',
+              },
+            });
+          }}
+        >
+          <View
+            style={{
+              justifyContent: 'center',
+              paddingRight: 14,
+            }}
+          >
+            <Icon name='minus-circle' size={26} />
+          </View>
+          <View>
+            <Text style={styles.optionCardTitle}>Remove Featured Product</Text>
+            <Text style={styles.optionCardSubtitle}>
+              Remove existing featured Product
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => {
+            navigation.navigate('Account', {
+              screen: 'ManageProduct',
+              params: {
                 action: 'EDIT_PRODUCTS_SCREEN',
               },
             });
@@ -196,7 +222,7 @@ export default function UserAccountView({ route, navigation }) {
         headerTitle: res.data.user.name,
       });
     });
-  }, []);
+  });
 
   if (!user) {
     return (

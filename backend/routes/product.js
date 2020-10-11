@@ -8,6 +8,15 @@ router.get('/all', async (req, res) => {
   res.json(products);
 });
 
+router.get('/featured/all', async (req, res) => {
+  try {
+    const products = await Product.find({ isFeatured: true });
+    res.json({ products, success: true });
+  } catch (error) {
+    res.json({ msg: error.message, success: false });
+  }
+});
+
 router.post('/add-product', async (req, res) => {
   try {
     const {
@@ -55,6 +64,14 @@ router.post('/:id/edit', async (req, res) => {
   } catch (error) {
     res.json({ success: false, msg: error.message });
   }
+});
+
+router.delete('/:id/delete', async (req, res) => {
+  try {
+    const pid = req.params.id;
+    await Product.findByIdAndRemove(pid);
+    res.json({ pid, success: true });
+  } catch (error) {}
 });
 
 module.exports = router;
