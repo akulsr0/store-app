@@ -13,7 +13,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Icons
 import { Feather as Icon } from '@expo/vector-icons';
 
-import Home from './screens/Home';
+import Home from './screens/Home/index';
 import Categories from './screens/Categories';
 import Cart from './screens/Cart';
 import Wishlist from './screens/Wishlist';

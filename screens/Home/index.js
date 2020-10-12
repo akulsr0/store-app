@@ -9,13 +9,11 @@ import {
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { connect } from 'react-redux';
-import { addProduct } from '../actions/product';
+import { addProduct } from '../../actions/product';
+
+import HomeScreen from './HomeScreen';
 
 const Stack = createStackNavigator();
-
-function HomeScreen(props) {
-  return <View></View>;
-}
 
 function Home(props) {
   return (

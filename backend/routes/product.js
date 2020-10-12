@@ -59,7 +59,6 @@ router.post('/:id/edit', async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(product_id, {
       ...req.body,
     });
-    console.log(updatedProduct);
     res.json({ product_id, updatedProduct, success: true });
   } catch (error) {
     res.json({ success: false, msg: error.message });
